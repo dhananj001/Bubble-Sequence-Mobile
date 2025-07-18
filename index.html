@@ -197,7 +197,7 @@
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      padding: 4vh 0;
+      /* padding: 4vh 0; */
       z-index: 100;
       transition: opacity 0.4s;
     }
@@ -320,7 +320,53 @@
     #settingsModal {
       z-index: 9999;
     }
+    #settingsModal button svg {
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+    @keyframes x-bounce {
+      0%   { transform: scale(1) translateY(0);}
+      20%  { transform: scale(1.3, 0.7) translateY(-10px);}
+      40%  { transform: scale(0.7, 1.3) translateY(10px);}
+      60%  { transform: scale(1.2, 0.8) translateY(-6px);}
+      80%  { transform: scale(0.9, 1.1) translateY(4px);}
+      100% { transform: scale(1) translateY(0);}
+    }
+    @keyframes x-professional-shake {
+      0% { transform: translateX(0); }
+      15% { transform: translateX(-8px); }
+      30% { transform: translateX(8px); }
+      45% { transform: translateX(-6px); }
+      60% { transform: translateX(6px); }
+      75% { transform: translateX(-4px); }
+      90% { transform: translateX(4px); }
+      100% { transform: translateX(0); }
+    }
+    .x-animate {
+      display: inline-block;
+      animation: x-professional-shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+      color: #DC143C;
+      text-shadow: 0 2px 8px #ffd6decc, 0 1px 0 #fff;
+    }
+    #homeBtn {
+      position: fixed;
+      top: 24px;
+      left: 24px;
+      z-index: 110;
+      background: rgba(255,255,255,0.85);
+      border-radius: 50%;
+      box-shadow: 0 2px 8px #ffd70033;
+      cursor: pointer;
+      transition: color 0.2s, background 0.2s;
+      padding: 6px;
+      display: none;
+    }
+    #homeBtn:hover svg {
+      fill: #222;
+      stroke: #222;
+    }
   </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 
 <body>
@@ -447,13 +493,28 @@
   <div id="settingsModal">
     <div class="modalContent">
       <h2>⚙️ Settings</h2>
-      <button onclick="toggleSound()">Sound: <span id="soundStatus">On</span></button>
-      <button onclick="resetHighScore()">Reset High Score</button>
-      <button onclick="closeSettings()">Close</button>
+      <button onclick="toggleSound()">
+        <i class="fa-solid fa-volume-up" style="margin-right:8px;color:#1E90FF;"></i>
+        Sound: <span id="soundStatus">On</span>
+      </button>
+      <button onclick="resetHighScore()">
+        <i class="fa-solid fa-rotate-left" style="margin-right:8px;color:#FFD700;"></i>
+        Reset High Score
+      </button>
+      <button onclick="closeSettings()">
+        <i class="fa-solid fa-circle-xmark" style="margin-right:8px;color:#DC143C;"></i>
+        Close
+      </button>
     </div>
   </div>
 
   <div id="startSettingsBtn" onclick="openSettings()" title="Settings">⚙️</div>
+  <div id="homeBtn" title="Home" style="display:none;">
+    <svg width="2.2em" height="2.2em" viewBox="0 0 24 24" fill="#888" style="vertical-align:middle;">
+      <path d="M3 12L12 4l9 8" stroke="#888" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="7" y="13" width="10" height="7" rx="2" fill="#fff9d1" stroke="#888" stroke-width="2"/>
+    </svg>
+  </div>
 
   <audio id="fireSound" src="shoot.mp3" preload="auto"></audio>
   <audio id="hitSound" src="pop.mp3" preload="auto"></audio>
@@ -467,6 +528,7 @@
     let timeLeft = 10, timerInterval, difficulty = 'easy', soundOn = true;
     const shootBuffer = document.getElementById('fireSound');
     const popBuffer = document.getElementById('hitSound');
+    const homeBtn = document.getElementById('homeBtn');
 
     const scoreDisplay = document.getElementById('score');
     const highScoreDisplay = document.getElementById('highScore');
@@ -485,6 +547,7 @@
     highScoreDisplay.textContent = highScore;
     startHighScore.textContent = highScore;
     startModal.style.display = 'flex';
+    homeBtn.style.display = 'block'; // Ensure home button is visible on start
 
     function resizeCanvas() {
       canvas.width = canvas.offsetWidth;
@@ -681,11 +744,24 @@
       }
       modal.style.display = 'flex';
       document.querySelector('.nextBtn').style.display = isSuccess ? 'inline-block' : 'none';
+
+      // Animate the X if failed
+      if (!isSuccess && title.includes('❌')) {
+        modalTitle.classList.remove('x-animate'); // reset if needed
+        void modalTitle.offsetWidth; // force reflow
+        modalTitle.classList.add('x-animate');
+        modalTitle.addEventListener('animationend', function handler() {
+          modalTitle.classList.remove('x-animate');
+          modalTitle.removeEventListener('animationend', handler);
+        });
+      }
     }
 
     function startGame(diff) {
       difficulty = diff; score = 0; scoreDisplay.textContent = score;
-      startModal.style.display = 'none'; setupLevel();
+      startModal.style.display = 'none';
+      homeBtn.style.display = 'block'; // Show home button
+      setupLevel();
     }
 
     function setupLevel() {
@@ -700,6 +776,7 @@
         timeLeft--; progress.style.width = (timeLeft / 10 * 100) + '%';
         if (timeLeft <= 0) { clearInterval(timerInterval); failLevel('Time up!'); }
       }, 1000);
+      homeBtn.style.display = 'block'; // Ensure home button is visible on level start
     }
 
     function resetLevel() { modal.style.display = 'none'; setupLevel(); }
@@ -727,8 +804,14 @@
       score = 0;
       scoreDisplay.textContent = score;
       startModal.style.display = 'none';
+      homeBtn.style.display = 'block'; // Show home button
       setupLevel();
     }
+
+    homeBtn.onclick = function() {
+      startModal.style.display = 'flex';
+      homeBtn.style.display = 'none';
+    };
   </script>
 
 
