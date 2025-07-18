@@ -1,0 +1,16 @@
+{
+  "name": "Bubble Sequence Game",
+  "short_name": "BubbleGame",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fcb69f",
+  "theme_color": "#fcb69f",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ]
+}
