@@ -941,6 +941,9 @@
         // Blur increases as thumb moves right (max 6px)
         const percent = Math.max(0, Math.min(1, x / (slideTrack.offsetWidth - thumb.offsetWidth)));
         slideText.style.setProperty('--slide-blur', dragging ? (percent * 6) + 'px' : '0px');
+        // Glow effect: increase box-shadow intensity as thumb moves right
+        const glowStrength = 8 + percent * 32; // from 8px to 40px
+        thumb.style.boxShadow = `0 2px ${glowStrength}px ${glowStrength/2}px #ffffffcc, 0 2px 8px #ffffff88`;
       }
 
       function onStart(e) {
@@ -966,6 +969,10 @@
         maxX = slideTrack.offsetWidth - thumb.offsetWidth;
         if (thumbX > maxX - 10) {
           // Success!
+          // Haptic feedback (vibration) on success
+          if (window.navigator && navigator.vibrate) {
+            navigator.vibrate(30);
+          }
           thumb.classList.add('success');
           slideText.style.setProperty('--slide-blur', '0px');
           setTimeout(() => {
@@ -978,6 +985,8 @@
           // Animate back
           thumb.style.transition = 'left 0.3s cubic-bezier(.4,0,.2,1)';
           setThumb(0);
+          // Remove glow when sliding back
+          thumb.style.boxShadow = '';
           setTimeout(() => {
             thumb.style.transition = '';
             thumbX = 0;
