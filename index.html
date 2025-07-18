@@ -1,168 +1,202 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<link rel="manifest" href="/manifest.json">
-<title>🎯 Bubble Sequence Game</title>
-<style>
-  body {
-    margin: 0;
-    font-family: 'Comic Sans MS', cursive, sans-serif;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: linear-gradient(-45deg, #ffecd2, #fcb69f, #ffecd2, #fcb69f);
-    background-size: 400% 400%;
-    animation: gradientShift 10s ease infinite;
-    overflow: hidden;
-    touch-action: none; /* Prevent zoom/pan on mobile */
-  }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#fcb69f" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-  @keyframes gradientShift {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
+  <link rel="manifest" href="/manifest.json">
+  <title>🎯 Bubble Sequence Game</title>
+  <style>
+    body {
 
-  h1 {
-    margin: 10px;
-    font-size: 6vw; /* Responsive text */
-    text-align: center;
-  }
 
-  #status {
-    display: flex;
-    gap: 10vw;
-    margin-bottom: 8px;
-    font-size: 4vw;
-  }
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        background: #fcb69f;
+        overflow: hidden;
+      }
 
-  #progressBar {
-    width: 90vw;
-    height: 20px;
-    background: #ddd;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-bottom: 8px;
-  }
+      margin: 0;
+      font-family: 'Comic Sans MS',
+      cursive,
+      sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: linear-gradient(-45deg, #ffecd2, #fcb69f, #ffecd2, #fcb69f);
+      background-size: 400% 400%;
+      animation: gradientShift 10s ease infinite;
+      overflow: hidden;
+      touch-action: none;
+      /* Prevent zoom/pan on mobile */
+    }
 
-  #progress {
-    height: 100%;
-    background: #76c7c0;
-    width: 100%;
-    transition: width 1s linear;
-  }
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
 
-  #canvas-container {
-    position: relative;
-    width: 95vw;
-    height: 55vh;
-  }
+      50% {
+        background-position: 100% 50%;
+      }
 
-  canvas {
-    width: 100%;
-    height: 100%;
-    border: 2px solid #333;
-    border-radius: 10px;
-    background: white;
-  }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
 
-  .arrow {
-    position: absolute;
-    pointer-events: none;
-    transform: scale(1.2);
-  }
+    h1 {
+      margin: 10px;
+      font-size: 6vw;
+      /* Responsive text */
+      text-align: center;
+    }
 
-  #modal, #startModal, #settingsModal {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background: rgba(0,0,0,0.3);
-    backdrop-filter: blur(2px);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 10;
-  }
+    #status {
+      display: flex;
+      gap: 10vw;
+      margin-bottom: 8px;
+      font-size: 4vw;
+    }
 
-  .modalContent {
-    background: #fff;
-    padding: 20px;
-    width: 80vw;
-    max-width: 400px;
-    border-radius: 12px;
-    text-align: center;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-  }
+    #progressBar {
+      width: 90vw;
+      height: 20px;
+      background: #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
 
-  .modalContent h2 {
-    font-size: 5vw;
-  }
+    #progress {
+      height: 100%;
+      background: #76c7c0;
+      width: 100%;
+      transition: width 1s linear;
+    }
 
-  .modalContent p {
-    font-size: 4vw;
-    margin-bottom: 15px;
-  }
+    #canvas-container {
+      position: relative;
+      width: 95vw;
+      height: 55vh;
+    }
 
-  button {
-    width: 90%;
-    padding: 14px;
-    margin: 10px auto;
-    font-size: 4.5vw;
-    background: #333;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    display: block;
-  }
+    canvas {
+      width: 100%;
+      height: 100%;
+      border: 2px solid #333;
+      border-radius: 10px;
+      background: white;
+    }
 
-  button:hover {
-    background: #555;
-  }
+    .arrow {
+      position: absolute;
+      pointer-events: none;
+      transform: scale(1.2);
+    }
 
-  #settingsIcon {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 8vw;
-    cursor: pointer;
-  }
-</style>
+    #modal,
+    #startModal,
+    #settingsModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(2px);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .modalContent {
+      background: #fff;
+      padding: 20px;
+      width: 80vw;
+      max-width: 400px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .modalContent h2 {
+      font-size: 5vw;
+    }
+
+    .modalContent p {
+      font-size: 4vw;
+      margin-bottom: 15px;
+    }
+
+    button {
+      width: 90%;
+      padding: 14px;
+      margin: 10px auto;
+      font-size: 4.5vw;
+      background: #333;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      display: block;
+    }
+
+    button:hover {
+      background: #555;
+    }
+
+    #settingsIcon {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 8vw;
+      cursor: pointer;
+    }
+  </style>
 </head>
+
 <body>
-<h1>🎯 Bubble Sequence</h1>
+  <h1>🎯 Bubble Sequence</h1>
 
-<div id="status">
-  <div>Score: <span id="score">0</span></div>
-  <div>High: <span id="highScore">0</span></div>
-</div>
+  <div id="status">
+    <div>Score: <span id="score">0</span></div>
+    <div>High: <span id="highScore">0</span></div>
+  </div>
 
-<div id="progressBar">
-  <div id="progress"></div>
-</div>
+  <div id="progressBar">
+    <div id="progress"></div>
+  </div>
 
-<div id="canvas-container">
-  <canvas id="canvas"></canvas>
+  <div id="canvas-container">
+    <canvas id="canvas"></canvas>
 
-  <!-- Arrows -->
-  <svg class="arrow" id="arrow0" width="50" height="20">
-    <polygon points="0,10 20,0 20,6 50,6 50,14 20,14 20,20" fill="black"/>
-  </svg>
-  <svg class="arrow" id="arrow1" width="50" height="20">
-    <polygon points="0,10 20,0 20,6 50,6 50,14 20,14 20,20" fill="black"/>
-  </svg>
-  <svg class="arrow" id="arrow2" width="50" height="20">
-    <polygon points="0,10 20,0 20,6 50,6 50,14 20,14 20,20" fill="black"/>
-  </svg>
-  <svg class="arrow" id="arrow3" width="50" height="20">
-    <polygon points="0,10 20,0 20,6 50,6 50,14 20,14 20,20" fill="black"/>
-  </svg>
-</div>
+    <!-- Arrows -->
+    <svg class="arrow" id="arrow0" width="50" height="20">
+      <polygon points="0,10 20,0 20,6 50,6 50,14 20,14 20,20" fill="black" />
+    </svg>
+    <svg class="arrow" id="arrow1" width="50" height="20">
+      <polygon points="0,10 20,0 20,6 50,6 50,14 20,14 20,20" fill="black" />
+    </svg>
+    <svg class="arrow" id="arrow2" width="50" height="20">
+      <polygon points="0,10 20,0 20,6 50,6 50,14 20,14 20,20" fill="black" />
+    </svg>
+    <svg class="arrow" id="arrow3" width="50" height="20">
+      <polygon points="0,10 20,0 20,6 50,6 50,14 20,14 20,20" fill="black" />
+    </svg>
+  </div>
 
-<button id="installBtn" style="
+  <button id="installBtn" style="
   display: none;
   position: fixed;
   bottom: 20px;
@@ -178,257 +212,258 @@
 ">📲 Install App</button>
 
 
-<!-- Modals -->
-<div id="startModal">
-  <div class="modalContent">
-    <h2>🎉 Welcome!</h2>
-    <p>Tap bubbles in ascending order. Be quick for bonuses!</p>
-    <button onclick="startGame('easy')">Easy</button>
-    <button onclick="startGame('moderate')">Moderate</button>
-    <button onclick="startGame('hard')">Hard</button>
+  <!-- Modals -->
+  <div id="startModal">
+    <div class="modalContent">
+      <h2>🎉 Welcome!</h2>
+      <p>Tap bubbles in ascending order. Be quick for bonuses!</p>
+      <button onclick="startGame('easy')">Easy</button>
+      <button onclick="startGame('moderate')">Moderate</button>
+      <button onclick="startGame('hard')">Hard</button>
+    </div>
   </div>
-</div>
 
-<div id="modal">
-  <div class="modalContent">
-    <h2 id="modalTitle"></h2>
-    <p id="modalMsg"></p>
-    <button class="retryBtn" onclick="resetLevel()">Retry</button>
-    <button class="nextBtn" onclick="nextLevel()">Next</button>
+  <div id="modal">
+    <div class="modalContent">
+      <h2 id="modalTitle"></h2>
+      <p id="modalMsg"></p>
+      <button class="retryBtn" onclick="resetLevel()">Retry</button>
+      <button class="nextBtn" onclick="nextLevel()">Next</button>
+    </div>
   </div>
-</div>
 
-<div id="settingsModal">
-  <div class="modalContent">
-    <h2>⚙️ Settings</h2>
-    <button onclick="toggleSound()">Sound: <span id="soundStatus">On</span></button>
-    <button onclick="resetHighScore()">Reset High Score</button>
-    <button onclick="closeSettings()">Close</button>
+  <div id="settingsModal">
+    <div class="modalContent">
+      <h2>⚙️ Settings</h2>
+      <button onclick="toggleSound()">Sound: <span id="soundStatus">On</span></button>
+      <button onclick="resetHighScore()">Reset High Score</button>
+      <button onclick="closeSettings()">Close</button>
+    </div>
   </div>
-</div>
 
-<div id="settingsIcon" onclick="openSettings()">⚙️</div>
+  <div id="settingsIcon" onclick="openSettings()">⚙️</div>
 
-<audio id="fireSound" src="shoot.mp3" preload="auto"></audio>
-<audio id="hitSound" src="pop.mp3" preload="auto"></audio>
+  <audio id="fireSound" src="shoot.mp3" preload="auto"></audio>
+  <audio id="hitSound" src="pop.mp3" preload="auto"></audio>
 
-<script>
-  const canvas = document.getElementById('canvas');
-  const ctx = canvas.getContext('2d');
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
 
-  let bubbles = [], arrows = [], sortedNumbers = [], currentTargetNumber = null;
-  let score = 0, highScore = localStorage.getItem('highScore') || 0;
-  let timeLeft = 10, timerInterval, difficulty = 'easy', soundOn = true;
-  const shootBuffer = document.getElementById('fireSound');
-  const popBuffer = document.getElementById('hitSound');
+    let bubbles = [], arrows = [], sortedNumbers = [], currentTargetNumber = null;
+    let score = 0, highScore = localStorage.getItem('highScore') || 0;
+    let timeLeft = 10, timerInterval, difficulty = 'easy', soundOn = true;
+    const shootBuffer = document.getElementById('fireSound');
+    const popBuffer = document.getElementById('hitSound');
 
-  const scoreDisplay = document.getElementById('score');
-  const highScoreDisplay = document.getElementById('highScore');
-  const progress = document.getElementById('progress');
-  const modal = document.getElementById('modal');
-  const modalTitle = document.getElementById('modalTitle');
-  const modalMsg = document.getElementById('modalMsg');
-  const startModal = document.getElementById('startModal');
-  const settingsModal = document.getElementById('settingsModal');
-  const soundStatus = document.getElementById('soundStatus');
+    const scoreDisplay = document.getElementById('score');
+    const highScoreDisplay = document.getElementById('highScore');
+    const progress = document.getElementById('progress');
+    const modal = document.getElementById('modal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalMsg = document.getElementById('modalMsg');
+    const startModal = document.getElementById('startModal');
+    const settingsModal = document.getElementById('settingsModal');
+    const soundStatus = document.getElementById('soundStatus');
 
-  const bubbleColors = ['#FFD700', '#1E90FF', '#DC143C', '#32CD32'];
-  const arrowSpeed = 8;
+    const bubbleColors = ['#FFD700', '#1E90FF', '#DC143C', '#32CD32'];
+    const arrowSpeed = 8;
 
-  highScoreDisplay.textContent = highScore;
-  startModal.style.display = 'flex';
+    highScoreDisplay.textContent = highScore;
+    startModal.style.display = 'flex';
 
-  function resizeCanvas() {
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-  }
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
-
-  function randomNumbers() {
-    let min = 1, max = 20;
-    if (difficulty === 'moderate') { min = 20; max = 50; }
-    if (difficulty === 'hard') { min = 50; max = 100; }
-    const nums = [];
-    while (nums.length < 4) {
-      let n = Math.floor(Math.random() * (max - min + 1)) + min;
-      if (!nums.includes(n)) nums.push(n);
+    function resizeCanvas() {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
     }
-    return nums;
-  }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
 
-  function initBubbles(nums) {
-    bubbles = [];
-    let spacing = canvas.height / 5;
-    for (let i = 0; i < 4; i++) {
-      bubbles.push({
-        x: canvas.width * 0.2,
-        y: spacing * (i + 1),
-        r: canvas.width * 0.07,
-        number: nums[i],
-        color: bubbleColors[i],
-        hitColor: '#999',
-        popped: false,
-        bounce: 0
+    function randomNumbers() {
+      let min = 1, max = 20;
+      if (difficulty === 'moderate') { min = 20; max = 50; }
+      if (difficulty === 'hard') { min = 50; max = 100; }
+      const nums = [];
+      while (nums.length < 4) {
+        let n = Math.floor(Math.random() * (max - min + 1)) + min;
+        if (!nums.includes(n)) nums.push(n);
+      }
+      return nums;
+    }
+
+    function initBubbles(nums) {
+      bubbles = [];
+      let spacing = canvas.height / 5;
+      for (let i = 0; i < 4; i++) {
+        bubbles.push({
+          x: canvas.width * 0.2,
+          y: spacing * (i + 1),
+          r: canvas.width * 0.07,
+          number: nums[i],
+          color: bubbleColors[i],
+          hitColor: '#999',
+          popped: false,
+          bounce: 0
+        });
+      }
+    }
+
+    function initArrows() {
+      arrows = [];
+      let spacing = canvas.height / 5;
+      for (let i = 0; i < 4; i++) {
+        arrows.push({ id: 'arrow' + i, top: spacing * (i + 1) - 10, left: canvas.width * 0.85, moving: false });
+      }
+    }
+
+    function drawBubbles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      bubbles.forEach(b => {
+        ctx.beginPath();
+        ctx.arc(b.x, b.y - b.bounce, b.r, 0, Math.PI * 2);
+        ctx.fillStyle = b.color;
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#000';
+        ctx.font = `${canvas.width * 0.05}px Comic Sans MS`;
+        ctx.textAlign = 'center';
+        ctx.fillText(`${b.number}`, b.x, b.y - b.bounce + 7);
       });
     }
-  }
 
-  function initArrows() {
-    arrows = [];
-    let spacing = canvas.height / 5;
-    for (let i = 0; i < 4; i++) {
-      arrows.push({ id: 'arrow' + i, top: spacing * (i + 1) - 10, left: canvas.width * 0.85, moving: false });
-    }
-  }
-
-  function drawBubbles() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    bubbles.forEach(b => {
-      ctx.beginPath();
-      ctx.arc(b.x, b.y - b.bounce, b.r, 0, Math.PI * 2);
-      ctx.fillStyle = b.color;
-      ctx.fill();
-      ctx.stroke();
-      ctx.fillStyle = '#000';
-      ctx.font = `${canvas.width * 0.05}px Comic Sans MS`;
-      ctx.textAlign = 'center';
-      ctx.fillText(`${b.number}`, b.x, b.y - b.bounce + 7);
-    });
-  }
-
-  function updateArrows() {
-    arrows.forEach((a, i) => {
-      if (a.moving) {
-        if (a.left > bubbles[i].x + bubbles[i].r) {
-          a.left -= arrowSpeed;
-        } else {
-          a.moving = false;
-          bubbles[i].color = bubbles[i].hitColor;
-          bubbles[i].popped = true;
-          bubbles[i].bounce = 10;
-          document.getElementById(a.id).querySelector('polygon').setAttribute('fill', '#999');
-          if (soundOn) popBuffer.cloneNode().play();
-          checkLevelStatus();
-        }
-      }
-      const el = document.getElementById(a.id);
-      el.style.left = `${a.left}px`; el.style.top = `${a.top}px`;
-    });
-  }
-
-  function animate() {
-    bubbles.forEach(b => { if (b.bounce > 0) b.bounce -= 0.5; });
-    drawBubbles();
-    updateArrows();
-    requestAnimationFrame(animate);
-  }
-
-  canvas.addEventListener('touchstart', e => {
-    const rect = canvas.getBoundingClientRect();
-    const mx = e.touches[0].clientX - rect.left, my = e.touches[0].clientY - rect.top;
-    bubbles.forEach((b, i) => {
-      if (!b.popped && !arrows[i].moving) {
-        const dx = mx - b.x, dy = my - b.y;
-        if (Math.sqrt(dx * dx + dy * dy) < b.r) {
-          if (b.number === currentTargetNumber) {
-            arrows[i].moving = true;
-            if (soundOn) shootBuffer.cloneNode().play();
-            let idx = sortedNumbers.indexOf(currentTargetNumber);
-            currentTargetNumber = sortedNumbers[idx + 1];
+    function updateArrows() {
+      arrows.forEach((a, i) => {
+        if (a.moving) {
+          if (a.left > bubbles[i].x + bubbles[i].r) {
+            a.left -= arrowSpeed;
           } else {
-            failLevel(`Oops! Expected ${currentTargetNumber}.`);
+            a.moving = false;
+            bubbles[i].color = bubbles[i].hitColor;
+            bubbles[i].popped = true;
+            bubbles[i].bounce = 10;
+            document.getElementById(a.id).querySelector('polygon').setAttribute('fill', '#999');
+            if (soundOn) popBuffer.cloneNode().play();
+            checkLevelStatus();
           }
         }
-      }
-    });
-  });
-
-  function checkLevelStatus() {
-    if (bubbles.every(b => b.popped)) {
-      clearInterval(timerInterval);
-      let bonus = timeLeft * 10, base = 100;
-      score += base + bonus;
-      scoreDisplay.textContent = score;
-      if (score > highScore) {
-        highScore = score;
-        localStorage.setItem('highScore', highScore);
-      }
-      highScoreDisplay.textContent = highScore;
-      showModal('🎉 Level Cleared!', `+${base} base + ${bonus} time bonus`, true);
+        const el = document.getElementById(a.id);
+        el.style.left = `${a.left}px`; el.style.top = `${a.top}px`;
+      });
     }
-  }
 
-  function showModal(title, msg, isSuccess = false) {
-    modalTitle.textContent = title;
-    modalMsg.textContent = msg;
-    modal.style.display = 'flex';
-    document.querySelector('.nextBtn').style.display = isSuccess ? 'inline-block' : 'none';
-  }
+    function animate() {
+      bubbles.forEach(b => { if (b.bounce > 0) b.bounce -= 0.5; });
+      drawBubbles();
+      updateArrows();
+      requestAnimationFrame(animate);
+    }
 
-  function startGame(diff) {
-    difficulty = diff; score = 0; scoreDisplay.textContent = score;
-    startModal.style.display = 'none'; setupLevel();
-  }
+    canvas.addEventListener('touchstart', e => {
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.touches[0].clientX - rect.left, my = e.touches[0].clientY - rect.top;
+      bubbles.forEach((b, i) => {
+        if (!b.popped && !arrows[i].moving) {
+          const dx = mx - b.x, dy = my - b.y;
+          if (Math.sqrt(dx * dx + dy * dy) < b.r) {
+            if (b.number === currentTargetNumber) {
+              arrows[i].moving = true;
+              if (soundOn) shootBuffer.cloneNode().play();
+              let idx = sortedNumbers.indexOf(currentTargetNumber);
+              currentTargetNumber = sortedNumbers[idx + 1];
+            } else {
+              failLevel(`Oops! Expected ${currentTargetNumber}.`);
+            }
+          }
+        }
+      });
+    });
 
-  function setupLevel() {
-    const nums = randomNumbers();
-    sortedNumbers = [...nums].sort((a, b) => a - b);
-    currentTargetNumber = sortedNumbers[0];
-    initBubbles(nums); initArrows();
-    progress.style.width = '100%'; modal.style.display = 'none';
-    timeLeft = 10;
-    clearInterval(timerInterval);
-    timerInterval = setInterval(() => {
-      timeLeft--; progress.style.width = (timeLeft / 10 * 100) + '%';
-      if (timeLeft <= 0) { clearInterval(timerInterval); failLevel('Time up!'); }
-    }, 1000);
-  }
+    function checkLevelStatus() {
+      if (bubbles.every(b => b.popped)) {
+        clearInterval(timerInterval);
+        let bonus = timeLeft * 10, base = 100;
+        score += base + bonus;
+        scoreDisplay.textContent = score;
+        if (score > highScore) {
+          highScore = score;
+          localStorage.setItem('highScore', highScore);
+        }
+        highScoreDisplay.textContent = highScore;
+        showModal('🎉 Level Cleared!', `+${base} base + ${bonus} time bonus`, true);
+      }
+    }
 
-  function resetLevel() { modal.style.display = 'none'; setupLevel(); }
-  function nextLevel() { modal.style.display = 'none'; setupLevel(); }
-  function failLevel(msg) { clearInterval(timerInterval); score = 0; scoreDisplay.textContent = score; showModal('❌ Failed!', msg, false); }
+    function showModal(title, msg, isSuccess = false) {
+      modalTitle.textContent = title;
+      modalMsg.textContent = msg;
+      modal.style.display = 'flex';
+      document.querySelector('.nextBtn').style.display = isSuccess ? 'inline-block' : 'none';
+    }
 
-  function openSettings() { settingsModal.style.display = 'flex'; soundStatus.textContent = soundOn ? 'On' : 'Off'; }
-  function closeSettings() { settingsModal.style.display = 'none'; }
-  function toggleSound() { soundOn = !soundOn; soundStatus.textContent = soundOn ? 'On' : 'Off'; }
-  function resetHighScore() { highScore = 0; localStorage.removeItem('highScore'); highScoreDisplay.textContent = 0; }
+    function startGame(diff) {
+      difficulty = diff; score = 0; scoreDisplay.textContent = score;
+      startModal.style.display = 'none'; setupLevel();
+    }
 
-  animate();
-</script>
+    function setupLevel() {
+      const nums = randomNumbers();
+      sortedNumbers = [...nums].sort((a, b) => a - b);
+      currentTargetNumber = sortedNumbers[0];
+      initBubbles(nums); initArrows();
+      progress.style.width = '100%'; modal.style.display = 'none';
+      timeLeft = 10;
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timeLeft--; progress.style.width = (timeLeft / 10 * 100) + '%';
+        if (timeLeft <= 0) { clearInterval(timerInterval); failLevel('Time up!'); }
+      }, 1000);
+    }
+
+    function resetLevel() { modal.style.display = 'none'; setupLevel(); }
+    function nextLevel() { modal.style.display = 'none'; setupLevel(); }
+    function failLevel(msg) { clearInterval(timerInterval); score = 0; scoreDisplay.textContent = score; showModal('❌ Failed!', msg, false); }
+
+    function openSettings() { settingsModal.style.display = 'flex'; soundStatus.textContent = soundOn ? 'On' : 'Off'; }
+    function closeSettings() { settingsModal.style.display = 'none'; }
+    function toggleSound() { soundOn = !soundOn; soundStatus.textContent = soundOn ? 'On' : 'Off'; }
+    function resetHighScore() { highScore = 0; localStorage.removeItem('highScore'); highScoreDisplay.textContent = 0; }
+
+    animate();
+  </script>
 
 
-<script>
+  <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js');
     }
   </script>
 
   <script>
-let deferredPrompt;
-const installBtn = document.getElementById('installBtn');
+    let deferredPrompt;
+    const installBtn = document.getElementById('installBtn');
 
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault(); // Stop auto prompt
-  deferredPrompt = e;
-  installBtn.style.display = 'block'; // Show button
-});
-
-installBtn.addEventListener('click', () => {
-  installBtn.style.display = 'none';
-  if (deferredPrompt) {
-    deferredPrompt.prompt(); // Show install prompt
-    deferredPrompt.userChoice.then(choiceResult => {
-      if (choiceResult.outcome === 'accepted') {
-        console.log('✅ User installed the app');
-      } else {
-        console.log('❌ User dismissed install');
-      }
-      deferredPrompt = null;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault(); // Stop auto prompt
+      deferredPrompt = e;
+      installBtn.style.display = 'block'; // Show button
     });
-  }
-});
-</script>
+
+    installBtn.addEventListener('click', () => {
+      installBtn.style.display = 'none';
+      if (deferredPrompt) {
+        deferredPrompt.prompt(); // Show install prompt
+        deferredPrompt.userChoice.then(choiceResult => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('✅ User installed the app');
+          } else {
+            console.log('❌ User dismissed install');
+          }
+          deferredPrompt = null;
+        });
+      }
+    });
+  </script>
 
 </body>
+
 </html>
