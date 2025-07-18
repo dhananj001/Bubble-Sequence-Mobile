@@ -542,8 +542,8 @@
   <button id="installBtn" style="
   display: none;
   position: fixed;
-  bottom: 20px;
   left: 50%;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
   transform: translateX(-50%);
   background: #333;
   color: #fff;
@@ -552,6 +552,7 @@
   border-radius: 8px;
   border: none;
   z-index: 999;
+  box-shadow: 0 2px 8px #0002;
 ">📲 Install App</button>
 
 
@@ -1008,9 +1009,11 @@
     // When start modal is shown, trigger the shimmer animation (no JS needed, always animates)
     function showStartModal() {
       document.getElementById('startModal').style.display = 'flex';
+      if (deferredPrompt) installBtn.style.display = 'block';
     }
     function hideStartModal() {
       document.getElementById('startModal').style.display = 'none';
+      installBtn.style.display = 'none';
     }
 
     // On page load, shimmer animates automatically
