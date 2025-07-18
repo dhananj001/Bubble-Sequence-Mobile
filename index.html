@@ -28,9 +28,7 @@
 
     body {
       margin: 0;
-      font-family: 'Comic Sans MS',
-        cursive,
-        sans-serif;
+      font-family: 'Baloo 2', 'Comic Sans MS', cursive, sans-serif;
       height: 100vh;
       display: flex;
       flex-direction: column;
@@ -258,6 +256,7 @@
       margin: 1.2em 0 1.6em 0;
     }
     .modalContent .difficulty button {
+      font-family: 'Baloo 2', 'Comic Sans MS', cursive, sans-serif;
       font-size: 1.1em;
       padding: 10px 18px;
       border-radius: 8px;
@@ -392,7 +391,7 @@
     .slide-to-play .slide-track {
       width: 100%;
       height: 54px;
-      background: linear-gradient(90deg, #FFD700 0%, #FFD6DE 100%);
+      background: linear-gradient(90deg, #202020 0%, #ffd700 100%);
       border-radius: 32px;
       position: relative;
       box-shadow: 0 4px 18px 0 #ffd70033, 0 1.5px 0 #fff9d1cc;
@@ -429,10 +428,10 @@
     }
     .slide-to-play .slide-thumb.active {
       box-shadow: 0 4px 16px #ffd70088;
-      background: #fff9d1;
+      background: #fff3a7;
     }
     .slide-to-play .slide-thumb.success {
-      background: #FFD700;
+      background: #e0bf00;
       box-shadow: 0 4px 24px #FFD70099;
     }
     .slide-to-play .slide-track {
@@ -458,7 +457,7 @@
       z-index: 1;
       opacity: 1;
       /* shimmer effect base */
-      background: linear-gradient(110deg, transparent 20%, #fff 40%, #fff 60%, transparent 80%);
+      background: linear-gradient(110deg, transparent 10%, #fff 40%, #fff 70%, transparent 80%);
       background-size: 200% 100%;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
@@ -478,6 +477,7 @@
     }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
