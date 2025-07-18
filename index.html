@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"> -->
   <meta name="theme-color" content="#fcb69f" />
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,18 +16,6 @@
   <title>🎯 Bubble Sequence Game</title>
   <style>
     body {
-
-
-      html,
-      body {
-        margin: 0;
-        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-        width: 100%;
-        height: 100%;
-        background: #fcb69f;
-        overflow: hidden;
-      }
-
       margin: 0;
       font-family: 'Comic Sans MS',
       cursive,
@@ -43,6 +31,16 @@
       touch-action: none;
       /* Prevent zoom/pan on mobile */
     }
+
+    html,
+      body {
+        margin: 0;
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        width: 100%;
+        height: 100%;
+        background: #fcb69f;
+        overflow: hidden;
+      }
 
     @keyframes gradientShift {
       0% {
@@ -166,6 +164,15 @@
       right: 10px;
       font-size: 8vw;
       cursor: pointer;
+    }
+
+    #game-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #fcb69f;
     }
   </style>
 </head>
