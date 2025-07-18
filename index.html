@@ -41,6 +41,7 @@
       touch-action: none;
       /* Prevent zoom/pan on mobile */
       position: relative;
+      transition: background 0.8s cubic-bezier(.4,0,.2,1); /* Smooth background transition */
     }
 
     body::before, body::after {
@@ -590,77 +591,62 @@
       let spacing = canvas.height / 5;
       for (let i = 0; i < 4; i++) {
         arrows.push({ id: 'arrow' + i, top: spacing * (i + 1) - 10, left: canvas.width * 0.85, moving: false });
-        // Reset arrow color to gradient at the start of each level
+        // Set arrow gradient to match bubble color
         const arrowEl = document.getElementById('arrow' + i);
         if (arrowEl) {
+          // Get the gradient element
+          const grad = arrowEl.querySelector(`#arrowGrad${i}`);
+          if (grad) {
+            // Set both stops to the bubble color, or use a lighter/darker shade for gradient
+            grad.querySelector('stop[offset="0%"]').setAttribute('stop-color', bubbles[i]?.color || '#fff');
+            grad.querySelector('stop[offset="100%"]').setAttribute('stop-color', shadeColor(bubbles[i]?.color || '#fff', -20));
+          }
+          // Reset arrow polygon fill to use the gradient
           const poly = arrowEl.querySelector('polygon');
           if (poly) poly.setAttribute('fill', `url(#arrowGrad${i})`);
         }
       }
     }
 
+    // Helper to darken a hex color by percent
+    function shadeColor(color, percent) {
+      // color: "#RRGGBB", percent: -20 for 20% darker
+      let f = parseInt(color.slice(1),16), t = percent<0?0:255, p = percent<0?percent*-1:percent;
+      let R = f>>16, G = f>>8&0x00FF, B = f&0x0000FF;
+      return "#" + (0x1000000 + (Math.round((t-R)*p/100)+R)*0x10000 + (Math.round((t-G)*p/100)+G)*0x100 + (Math.round((t-B)*p/100)+B)).toString(16).slice(1);
+    }
+
     function drawBubbles() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       bubbles.forEach(b => {
-        // Draw drop shadow
+        // Flat pastel fill
         ctx.save();
-        ctx.beginPath();
-        ctx.arc(b.x, b.y - b.bounce + 6, b.r * 0.98, 0, Math.PI * 2);
-        ctx.shadowColor = 'rgba(60,60,60,0.18)';
-        ctx.shadowBlur = b.popped ? 0 : 18;
-        ctx.shadowOffsetY = 6;
-        ctx.fillStyle = '#000';
-        ctx.fill();
-        ctx.restore();
-
-        // Bubble gradient (glassy/3D look)
-        const grad = ctx.createRadialGradient(
-          b.x - b.r * 0.3, b.y - b.bounce - b.r * 0.3, b.r * 0.2,
-          b.x, b.y - b.bounce, b.r
-        );
-        grad.addColorStop(0, '#fff');
-        grad.addColorStop(0.2, b.color);
-        grad.addColorStop(0.8, b.popped ? '#bbb' : b.color);
-        grad.addColorStop(1, '#888');
         ctx.beginPath();
         ctx.arc(b.x, b.y - b.bounce, b.r, 0, Math.PI * 2);
-        ctx.fillStyle = grad;
-        ctx.globalAlpha = b.popped ? 0.7 : 1;
+        ctx.fillStyle = b.color; // Use the pastel color
+        ctx.globalAlpha = b.popped ? 0.5 : 1;
         ctx.fill();
         ctx.globalAlpha = 1;
-        ctx.strokeStyle = b.popped ? '#aaa' : '#333';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-
-        // Glassy highlight
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(b.x - b.r * 0.35, b.y - b.bounce - b.r * 0.35, b.r * 0.35, Math.PI * 1.1, Math.PI * 1.9, false);
-        ctx.globalAlpha = 0.25;
-        ctx.fillStyle = '#fff';
-        ctx.fill();
         ctx.restore();
 
-        // Subtle glow
-        if (!b.popped) {
-          ctx.save();
-          ctx.beginPath();
-          ctx.arc(b.x, b.y - b.bounce, b.r * 1.08, 0, Math.PI * 2);
-          ctx.globalAlpha = 0.12;
-          ctx.fillStyle = b.color;
-          ctx.fill();
-          ctx.restore();
-        }
+        // Thin, slightly darker border
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(b.x, b.y - b.bounce, b.r, 0, Math.PI * 2);
+        ctx.lineWidth = 3;
+        // Slightly darken the border color
+        ctx.strokeStyle = shadeColor(b.color, -20);
+        ctx.stroke();
+        ctx.restore();
 
         // Bubble number
+        ctx.save();
         ctx.fillStyle = '#222';
         ctx.font = `bold ${canvas.width * 0.055}px Comic Sans MS, Arial, sans-serif`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.shadowColor = 'rgba(255,255,255,0.5)';
-        ctx.shadowBlur = 2;
         ctx.fillText(`${b.number}`, b.x, b.y - b.bounce + 3);
-        ctx.shadowBlur = 0;
+        ctx.restore();
       });
     }
 
@@ -757,14 +743,34 @@
       }
     }
 
+    function updateBackgroundForDifficulty(diff) {
+      let bg;
+      switch (diff) {
+        case 'easy':
+          bg = 'linear-gradient(135deg, #fff9d1 0%, #e0f3ff 100%)';
+          break;
+        case 'moderate':
+          bg = 'linear-gradient(135deg, #e0f3ff 0%, #ffd6de 100%)';
+          break;
+        case 'hard':
+          bg = 'linear-gradient(135deg, #ffd6de 0%, #d9ffd6 100%)';
+          break;
+        default:
+          bg = 'linear-gradient(135deg, #fff9d1 0%, #e0f3ff 40%, #ffd6de 80%, #d9ffd6 100%)';
+      }
+      document.body.style.background = bg;
+    }
+
     function startGame(diff) {
       difficulty = diff; score = 0; scoreDisplay.textContent = score;
       startModal.style.display = 'none';
       homeBtn.style.display = 'block'; // Show home button
+      updateBackgroundForDifficulty(difficulty); // Update background
       setupLevel();
     }
 
     function setupLevel() {
+      updateBackgroundForDifficulty(difficulty); // Update background
       const nums = randomNumbers();
       sortedNumbers = [...nums].sort((a, b) => a - b);
       currentTargetNumber = sortedNumbers[0];
@@ -805,6 +811,7 @@
       scoreDisplay.textContent = score;
       startModal.style.display = 'none';
       homeBtn.style.display = 'block'; // Show home button
+      updateBackgroundForDifficulty(difficulty); // Update background
       setupLevel();
     }
 
