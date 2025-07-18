@@ -421,6 +421,11 @@
       pointer-events: all;
       /* Debug border: remove after testing */
       /* border: 2px solid #DC143C; */
+      -webkit-tap-highlight-color: transparent; /* Removes blue highlight on tap */
+      outline: none; /* Removes focus outline */
+    }
+    .slide-to-play .slide-thumb:focus {
+      outline: none;
     }
     .slide-to-play .slide-thumb.active {
       box-shadow: 0 4px 16px #ffd70088;
@@ -432,6 +437,44 @@
     }
     .slide-to-play .slide-track {
       overflow: hidden;
+      position: relative;
+    }
+    /* Slide text entrance and exit */
+    .slide-to-play .slide-text {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2em;
+      color: #888;
+      letter-spacing: 1px;
+      font-weight: 500;
+      pointer-events: none;
+      user-select: none;
+      z-index: 1;
+      opacity: 1;
+      /* shimmer effect base */
+      background: linear-gradient(110deg, transparent 20%, #fff 40%, #fff 60%, transparent 80%);
+      background-size: 200% 100%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-fill-color: transparent;
+      animation: slide-text-shimmer 1.5s linear infinite;
+      filter: blur(var(--slide-blur, 0px));
+      transition: filter 0.55s;
+    }
+    @keyframes slide-text-shimmer {
+      0% {
+        background-position: 200% 0;
+      }
+      100% {
+        background-position: 0% 0;
+      }
     }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -520,8 +563,8 @@
       </div>
       <!-- Slide to Play Slider -->
       <div id="slideToPlay" class="slide-to-play">
-        <span class="slide-text">Slide to Play</span>
         <div class="slide-track">
+          <span class="slide-text">Slide to Play</span>
           <div class="slide-thumb" id="slideThumb">
             <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFD700" xmlns="http://www.w3.org/2000/svg">
               <polygon points="6,4 20,12 6,20"/>
@@ -886,22 +929,28 @@
   <script>
     // Slide to Play Logic (runs immediately at end of body)
     const thumb = document.getElementById('slideThumb');
+    const slideText = document.querySelector('.slide-to-play .slide-text');
+    const slideTrack = thumb.parentElement;
+
     if (thumb) {
       thumb.style.left = '0px'; // Ensure thumb starts at left edge
-      const track = thumb.parentElement;
       let dragging = false, startX = 0, thumbX = 0, maxX = 0;
 
       function setThumb(x) {
         thumb.style.left = x + 'px';
+        // Blur increases as thumb moves right (max 6px)
+        const percent = Math.max(0, Math.min(1, x / (slideTrack.offsetWidth - thumb.offsetWidth)));
+        slideText.style.setProperty('--slide-blur', dragging ? (percent * 6) + 'px' : '0px');
       }
 
       function onStart(e) {
         dragging = true;
         thumb.classList.add('active');
         startX = (e.touches ? e.touches[0].clientX : e.clientX) - thumb.offsetLeft;
-        maxX = track.offsetWidth - thumb.offsetWidth;
+        maxX = slideTrack.offsetWidth - thumb.offsetWidth;
         document.addEventListener(e.touches ? 'touchmove' : 'mousemove', onMove);
         document.addEventListener(e.touches ? 'touchend' : 'mouseup', onEnd);
+        slideText.style.setProperty('--slide-blur', '0px');
       }
       function onMove(e) {
         if (!dragging) return;
@@ -914,16 +963,17 @@
       function onEnd(e) {
         dragging = false;
         thumb.classList.remove('active');
-        maxX = track.offsetWidth - thumb.offsetWidth;
+        maxX = slideTrack.offsetWidth - thumb.offsetWidth;
         if (thumbX > maxX - 10) {
           // Success!
           thumb.classList.add('success');
+          slideText.style.setProperty('--slide-blur', '0px');
           setTimeout(() => {
             thumb.classList.remove('success');
             setThumb(0);
             thumbX = 0;
             startGame();
-          }, 200);
+          }, 400);
         } else {
           // Animate back
           thumb.style.transition = 'left 0.3s cubic-bezier(.4,0,.2,1)';
@@ -931,6 +981,7 @@
           setTimeout(() => {
             thumb.style.transition = '';
             thumbX = 0;
+            slideText.style.setProperty('--slide-blur', '0px');
           }, 300);
         }
         document.removeEventListener(e.type === 'touchend' ? 'touchmove' : 'mousemove', onMove);
@@ -939,6 +990,16 @@
       thumb.addEventListener('mousedown', onStart);
       thumb.addEventListener('touchstart', onStart);
     }
+
+    // When start modal is shown, trigger the shimmer animation (no JS needed, always animates)
+    function showStartModal() {
+      document.getElementById('startModal').style.display = 'flex';
+    }
+    function hideStartModal() {
+      document.getElementById('startModal').style.display = 'none';
+    }
+
+    // On page load, shimmer animates automatically
   </script>
 
   <script>
