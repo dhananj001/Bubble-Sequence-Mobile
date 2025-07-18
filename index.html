@@ -480,6 +480,69 @@
         background-position: 0% 0;
       }
     }
+    .install-prompt-bar {
+      position: fixed;
+      top: calc(env(safe-area-inset-top, 0px) + 18px);
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1200;
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.95);
+      border-radius: 32px;
+      box-shadow: 0 2px 12px #0002;
+      padding: 0 8px 0 0;
+      min-height: 48px;
+      transition: box-shadow 0.2s, background 0.2s;
+      animation: install-bar-in 0.5s cubic-bezier(.4,0,.2,1);
+    }
+    @keyframes install-bar-in {
+      0% { opacity: 0; transform: translateX(-50%) scale(0.7); }
+      100% { opacity: 1; transform: translateX(-50%) scale(1); }
+    }
+    .install-btn {
+      display: flex;
+      align-items: center;
+      background: none;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 1.1em;
+      padding: 8px 18px 8px 14px;
+      border-radius: 32px;
+      transition: background 0.2s;
+      color: #222;
+    }
+    .install-btn:hover {
+      background: #fff9d1;
+    }
+    .install-icon {
+      font-size: 1.5em;
+      margin-right: 8px;
+    }
+    .install-text {
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      transition: opacity 0.3s, width 0.3s;
+    }
+    .install-close {
+      font-size: 1.5em;
+      color: #888;
+      margin-left: 2px;
+      margin-right: 8px;
+      cursor: pointer;
+      user-select: none;
+      transition: color 0.2s;
+      line-height: 1;
+      padding: 0 4px;
+      border-radius: 50%;
+    }
+    .install-close:hover {
+      color: #DC143C;
+      background: #ffd6de;
+    }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;700&display=swap" rel="stylesheet">
@@ -539,21 +602,13 @@
     </svg>
   </div>
 
-  <button id="installBtn" style="
-  display: none;
-  position: fixed;
-  left: 50%;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
-  transform: translateX(-50%);
-  background: #333;
-  color: #fff;
-  font-size: 18px;
-  padding: 12px 20px;
-  border-radius: 8px;
-  border: none;
-  z-index: 999;
-  box-shadow: 0 2px 8px #0002;
-">📲 Install App</button>
+  <div id="installPromptBar" class="install-prompt-bar" style="display:none;">
+    <button id="installPromptBtn" class="install-btn">
+      <span class="install-icon">📲</span>
+      <span class="install-text">Install App</span>
+    </button>
+    <span id="installPromptClose" class="install-close">&times;</span>
+  </div>
 
 
   <!-- Modals -->
@@ -1009,11 +1064,11 @@
     // When start modal is shown, trigger the shimmer animation (no JS needed, always animates)
     function showStartModal() {
       document.getElementById('startModal').style.display = 'flex';
-      if (deferredPrompt) installBtn.style.display = 'block';
+      if (deferredPrompt) installPromptBar.style.display = 'flex';
     }
     function hideStartModal() {
       document.getElementById('startModal').style.display = 'none';
-      installBtn.style.display = 'none';
+      installPromptBar.style.display = 'none';
     }
 
     // On page load, shimmer animates automatically
@@ -1027,16 +1082,22 @@
 
   <script>
     let deferredPrompt;
-    const installBtn = document.getElementById('installBtn');
+    const installPromptBar = document.getElementById('installPromptBar');
+    const installPromptBtn = document.getElementById('installPromptBtn');
+    const installPromptClose = document.getElementById('installPromptClose');
+    let installPromptDismissed = false;
 
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault(); // Stop auto prompt
       deferredPrompt = e;
-      installBtn.style.display = 'block'; // Show button
+      installPromptBar.style.display = 'flex';
+      if (document.getElementById('startModal').style.display === 'flex') {
+        installPromptBar.style.display = 'flex';
+      }
     });
 
-    installBtn.addEventListener('click', () => {
-      installBtn.style.display = 'none';
+    installPromptBtn.addEventListener('click', () => {
+      installPromptBar.style.display = 'none';
       if (deferredPrompt) {
         deferredPrompt.prompt(); // Show install prompt
         deferredPrompt.userChoice.then(choiceResult => {
@@ -1048,6 +1109,11 @@
           deferredPrompt = null;
         });
       }
+    });
+
+    installPromptClose.addEventListener('click', () => {
+      installPromptBar.style.display = 'none';
+      installPromptDismissed = true;
     });
   </script>
 
