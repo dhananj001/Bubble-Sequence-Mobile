@@ -105,7 +105,56 @@
       position: relative;
       width: 95vw;
       height: 55vh;
+      max-width: 600px;
+      max-height: 500px;
+      margin: 0 auto;
       overflow: hidden;
+      background: none;
+      box-shadow: 0 2px 16px #0001;
+      border-radius: 18px;
+    }
+    @media (min-width: 700px) {
+      html, body {
+        height: 100vh;
+        min-height: 100vh;
+        padding: 0;
+      }
+      #canvas-container {
+        width: 500px;
+        height: 400px;
+        max-width: 90vw;
+        max-height: 70vh;
+      }
+      h1 {
+        font-size: 2.5em;
+      }
+      #status {
+        font-size: 1.5em;
+      }
+      #progressBar {
+        width: 480px;
+        max-width: 90vw;
+      }
+      button, .modalContent .playBtn, .modalContent .difficulty button {
+        font-size: 1.1em !important;
+        padding: 10px 0 !important;
+      }
+      /* Make modal smaller on desktop */
+      .modalContent {
+        max-width: 320px !important;
+        padding: 18px 12px 14px 12px !important;
+        border-radius: 14px !important;
+      }
+      .modalContent h2 {
+        font-size: 1.4em !important;
+      }
+      .modalContent p {
+        font-size: 1em !important;
+      }
+      .star-rating .star {
+        width: 24px !important;
+        height: 24px !important;
+      }
     }
 
     canvas {
@@ -943,6 +992,27 @@
     canvas.addEventListener('touchstart', e => {
       const rect = canvas.getBoundingClientRect();
       const mx = e.touches[0].clientX - rect.left, my = e.touches[0].clientY - rect.top;
+      bubbles.forEach((b, i) => {
+        if (!b.popped && !arrows[i].moving) {
+          const dx = mx - b.x, dy = my - b.y;
+          if (Math.sqrt(dx * dx + dy * dy) < b.r) {
+            if (b.number === currentTargetNumber) {
+              arrows[i].moving = true;
+              if (soundOn) shootBuffer.cloneNode().play();
+              let idx = sortedNumbers.indexOf(currentTargetNumber);
+              currentTargetNumber = sortedNumbers[idx + 1];
+            } else {
+              failLevel(`Oops! Expected ${currentTargetNumber}.`);
+            }
+          }
+        }
+      });
+    });
+
+    // Add mouse event support for desktop bubble popping
+    canvas.addEventListener('mousedown', e => {
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left, my = e.clientY - rect.top;
       bubbles.forEach((b, i) => {
         if (!b.popped && !arrows[i].moving) {
           const dx = mx - b.x, dy = my - b.y;
