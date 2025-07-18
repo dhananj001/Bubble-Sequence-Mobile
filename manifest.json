@@ -3,7 +3,7 @@
   "short_name": "BubbleGame",
   "start_url": "./index.html",
   "display": "fullscreen",
-  "background_color": "#fcb69f",
+  "background_color": "#fff9d1",
   "theme_color": "#fcb69f",
   "orientation": "portrait",
   "icons": [
