@@ -274,21 +274,29 @@
       color: #222;
     }
     .modalContent .playBtn {
-      font-size: 1.4em;
-      padding: 16px 48px;
-      border-radius: 12px;
+      font-size: 1.5em;
+      padding: 18px 0;
+      border-radius: 32px;
       border: none;
-      background: linear-gradient(90deg, #ffd700 0%, #1e90ff 100%);
+      width: 80%;
+      background: linear-gradient(90deg, #FFD700 0%, #FFD6DE 100%);
       color: #222;
       font-weight: bold;
-      margin-top: 1.2em;
-      box-shadow: 0 2px 8px #ffd70044;
+      margin-top: 1.5em;
+      box-shadow: 0 4px 18px 0 #ffd70033, 0 1.5px 0 #fff9d1cc;
       cursor: pointer;
-      transition: background 0.2s, color 0.2s;
+      transition: background 0.2s, color 0.2s, transform 0.15s cubic-bezier(.4,0,.2,1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      letter-spacing: 0.5px;
     }
-    .modalContent .playBtn:hover {
-      background: linear-gradient(90deg, #1e90ff 0%, #ffd700 100%);
+    .modalContent .playBtn:hover, .modalContent .playBtn:active {
+      background: linear-gradient(90deg, #FFD6DE 0%, #FFD700 100%);
       color: #fff;
+      transform: scale(1.06);
+      box-shadow: 0 6px 24px 0 #ffd70055, 0 2px 0 #fff9d1cc;
     }
     .modalContent .settingsBtn {
       position: absolute;
@@ -365,6 +373,65 @@
     #homeBtn:hover svg {
       fill: #222;
       stroke: #222;
+    }
+    .slide-to-play {
+      width: 80%;
+      margin: 1.5em auto 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+    }
+    .slide-to-play .slide-text {
+      font-size: 1.2em;
+      color: #888;
+      margin-bottom: 0.7em;
+      letter-spacing: 1px;
+      font-weight: 500;
+    }
+    .slide-to-play .slide-track {
+      width: 100%;
+      height: 54px;
+      background: linear-gradient(90deg, #FFD700 0%, #FFD6DE 100%);
+      border-radius: 32px;
+      position: relative;
+      box-shadow: 0 4px 18px 0 #ffd70033, 0 1.5px 0 #fff9d1cc;
+      display: flex;
+      align-items: center;
+      /* Debug border: remove after testing */
+      border: 2px dashed #1E90FF;
+    }
+    .slide-to-play .slide-thumb {
+      width: 54px;
+      height: 54px;
+      background: #fff;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px #ffd70044;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      left: 0;
+      top: 0;
+      cursor: pointer;
+      transition: box-shadow 0.2s, background 0.2s;
+      z-index: 2;
+      touch-action: none;
+      user-select: none;
+      pointer-events: all;
+      /* Debug border: remove after testing */
+      border: 2px solid #DC143C;
+    }
+    .slide-to-play .slide-thumb.active {
+      box-shadow: 0 4px 16px #ffd70088;
+      background: #fff9d1;
+    }
+    .slide-to-play .slide-thumb.success {
+      background: #FFD700;
+      box-shadow: 0 4px 24px #FFD70099;
+    }
+    .slide-to-play .slide-track {
+      overflow: hidden;
     }
   </style>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
@@ -451,22 +518,17 @@
         <button onclick="selectDifficulty(this, 'moderate')"><span style="font-size:1.2em;vertical-align:middle;">🏃</span> Moderate</button>
         <button onclick="selectDifficulty(this, 'hard')"><span style="font-size:1.2em;vertical-align:middle;">🏆</span> Hard</button>
       </div>
-      <button class="playBtn" onclick="startGame()">
-        <svg width="1.3em" height="1.3em" viewBox="0 0 512 512" style="vertical-align:middle;margin-right:8px;" fill="#FFD700" xmlns="http://www.w3.org/2000/svg">
-          <g>
-            <g>
-              <g>
-                <path d="M256,0C114.618,0,0,114.618,0,256s114.618,256,256,256s256-114.618,256-256S397.382,0,256,0z M256,469.333
-                  c-117.818,0-213.333-95.515-213.333-213.333S138.182,42.667,256,42.667S469.333,138.182,469.333,256S373.818,469.333,256,469.333
-                  z"/>
-                <path d="M375.467,238.933l-170.667-128c-14.064-10.548-34.133-0.513-34.133,17.067v256c0,17.58,20.07,27.615,34.133,17.067
-                  l170.667-128C386.844,264.533,386.844,247.467,375.467,238.933z M213.333,341.333V170.667L327.111,256L213.333,341.333z"/>
-              </g>
-            </g>
-          </g>
-        </svg>
-        Play
-      </button>
+      <!-- Slide to Play Slider -->
+      <div id="slideToPlay" class="slide-to-play">
+        <span class="slide-text">Slide to Play</span>
+        <div class="slide-track">
+          <div class="slide-thumb" id="slideThumb">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="#FFD700" xmlns="http://www.w3.org/2000/svg">
+              <polygon points="6,4 20,12 6,20"/>
+            </svg>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -821,6 +883,63 @@
     };
   </script>
 
+  <script>
+    // Slide to Play Logic (runs immediately at end of body)
+    const thumb = document.getElementById('slideThumb');
+    if (thumb) {
+      thumb.style.left = '0px'; // Ensure thumb starts at left edge
+      const track = thumb.parentElement;
+      let dragging = false, startX = 0, thumbX = 0, maxX = 0;
+
+      function setThumb(x) {
+        thumb.style.left = x + 'px';
+      }
+
+      function onStart(e) {
+        dragging = true;
+        thumb.classList.add('active');
+        startX = (e.touches ? e.touches[0].clientX : e.clientX) - thumb.offsetLeft;
+        maxX = track.offsetWidth - thumb.offsetWidth;
+        document.addEventListener(e.touches ? 'touchmove' : 'mousemove', onMove);
+        document.addEventListener(e.touches ? 'touchend' : 'mouseup', onEnd);
+      }
+      function onMove(e) {
+        if (!dragging) return;
+        let clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        let x = clientX - startX;
+        x = Math.max(0, Math.min(x, maxX));
+        setThumb(x);
+        thumbX = x;
+      }
+      function onEnd(e) {
+        dragging = false;
+        thumb.classList.remove('active');
+        maxX = track.offsetWidth - thumb.offsetWidth;
+        if (thumbX > maxX - 10) {
+          // Success!
+          thumb.classList.add('success');
+          setTimeout(() => {
+            thumb.classList.remove('success');
+            setThumb(0);
+            thumbX = 0;
+            startGame();
+          }, 200);
+        } else {
+          // Animate back
+          thumb.style.transition = 'left 0.3s cubic-bezier(.4,0,.2,1)';
+          setThumb(0);
+          setTimeout(() => {
+            thumb.style.transition = '';
+            thumbX = 0;
+          }, 300);
+        }
+        document.removeEventListener(e.type === 'touchend' ? 'touchmove' : 'mousemove', onMove);
+        document.removeEventListener(e.type === 'touchend' ? 'touchend' : 'mouseup', onEnd);
+      }
+      thumb.addEventListener('mousedown', onStart);
+      thumb.addEventListener('touchstart', onStart);
+    }
+  </script>
 
   <script>
     if ('serviceWorker' in navigator) {
